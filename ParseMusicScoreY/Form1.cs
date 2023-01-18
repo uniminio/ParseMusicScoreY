@@ -34,7 +34,12 @@ namespace ParseMusicScoreY
             while ((line = fs.ReadLine()) != null)
             {
                 synchronizationContext!.Post(SetTips, line);
-                string[] rhythms = line.Split('/');
+                if (line.IndexOf('/') == -1)
+                {
+                    continue;
+                }
+                List<string> rhythms = new List<string>(line.Split('/'));
+                rhythms.RemoveAt(rhythms.Count - 1);
                 foreach (string rhythm in rhythms)
                 {
                     List<string> ls = new List<string>();
@@ -70,6 +75,10 @@ namespace ParseMusicScoreY
                             }
                             Thread.Sleep(sleepTime);
                         }
+                    }
+                    else
+                    {
+                        Thread.Sleep(rhythmTime);
                     }
                 }
             }
