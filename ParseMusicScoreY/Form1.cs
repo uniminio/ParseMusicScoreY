@@ -74,6 +74,7 @@ namespace ParseMusicScoreY
                 }
             }
             fs.Close();
+            synchronizationContext.Post(SetEnable, null);
         }
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -103,7 +104,19 @@ namespace ParseMusicScoreY
 
         private void button2_Click(object sender, EventArgs e)
         {
-            new Thread(StartPaly).Start();
+            button2.Enabled = false;
+            var ts = new Thread(new ThreadStart(StartPaly));
+            ts.Start();
+        }
+
+        private void SetEnable(object _o)
+        {
+            button2.Enabled = true;
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            System.Environment.Exit(0);
         }
     }
 }
