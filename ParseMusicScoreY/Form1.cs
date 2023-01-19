@@ -6,6 +6,10 @@ namespace ParseMusicScoreY
     public partial class Form1 : Form
     {
         private SynchronizationContext? synchronizationContext;
+        private bool myActivated;
+        private Thread? myThread;
+
+        private bool started;
         public Form1()
         {
             InitializeComponent();
@@ -38,6 +42,10 @@ namespace ParseMusicScoreY
             string[] lines = content.Split('\n');
             foreach(string line in lines)
             {
+                if (!started)
+                {
+                    return;
+                }
                 synchronizationContext!.Post(SetTips, line);
                 if (line.IndexOf('/') == -1)
                 {
@@ -70,18 +78,20 @@ namespace ParseMusicScoreY
                         int sleepTime = rhythmTime / ls.Count;
                         foreach (string l in ls)
                         {
-                            new Thread(() =>
+                            if (!myActivated)
                             {
-                                for (int i = 0; i < l.Length; i++)
+                                new Thread(() =>
                                 {
-                                    PressKey((Keys)l[i], false);
-                                }
-                                for (int i = 0; i < l.Length; i++)
-                                {
-                                    PressKey((Keys)l[i], true);
-                                }
-                            }).Start();
-                            
+                                    for (int i = 0; i < l.Length; i++)
+                                    {
+                                        PressKey((Keys)l[i], false);
+                                    }
+                                    for (int i = 0; i < l.Length; i++)
+                                    {
+                                        PressKey((Keys)l[i], true);
+                                    }
+                                }).Start();
+                            }
                             Thread.Sleep(sleepTime);
                         }
                     }
@@ -123,8 +133,9 @@ namespace ParseMusicScoreY
         private void button2_Click(object sender, EventArgs e)
         {
             button2.Enabled = false;
-            var ts = new Thread(new ThreadStart(StartPaly));
-            ts.Start();
+            started= true;
+            myThread = new Thread(new ThreadStart(StartPaly));
+            myThread.Start();
         }
 
         private void SetEnable(object _o)
@@ -135,6 +146,22 @@ namespace ParseMusicScoreY
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             System.Environment.Exit(0);
+        }
+
+        private void Form1_Activated(object sender, EventArgs e)
+        {
+            myActivated = true;
+        }
+
+        private void Form1_Deactivate(object sender, EventArgs e)
+        {
+            myActivated= false;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            started = false;
+            button2.Enabled = true;
         }
     }
 }
