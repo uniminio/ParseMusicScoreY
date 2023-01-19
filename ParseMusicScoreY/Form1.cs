@@ -17,6 +17,9 @@ namespace ParseMusicScoreY
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 textBox1.Text = openFileDialog1.FileName;
+                var fs = File.OpenText(textBox1.Text);
+                textBox2.Text = fs.ReadLine();
+                fs.Close();
             }
         }
 
@@ -30,8 +33,10 @@ namespace ParseMusicScoreY
             Thread.Sleep(2000);
             int rhythmTime = int.Parse(textBox2.Text);
             var fs = File.OpenText(textBox1.Text);
-            string? line;
-            while ((line = fs.ReadLine()) != null)
+            string content = fs.ReadToEnd();
+            fs.Close();
+            string[] lines = content.Split('\n');
+            foreach(string line in lines)
             {
                 synchronizationContext!.Post(SetTips, line);
                 if (line.IndexOf('/') == -1)
@@ -65,14 +70,18 @@ namespace ParseMusicScoreY
                         int sleepTime = rhythmTime / ls.Count;
                         foreach (string l in ls)
                         {
-                            for(int i = 0; i < l.Length; i++)
+                            new Thread(() =>
                             {
-                                PressKey((Keys)l[i], false);
-                            }
-                            for (int i = 0; i < l.Length; i++)
-                            {
-                                PressKey((Keys)l[i], true);
-                            }
+                                for (int i = 0; i < l.Length; i++)
+                                {
+                                    PressKey((Keys)l[i], false);
+                                }
+                                for (int i = 0; i < l.Length; i++)
+                                {
+                                    PressKey((Keys)l[i], true);
+                                }
+                            }).Start();
+                            
                             Thread.Sleep(sleepTime);
                         }
                     }
@@ -82,8 +91,8 @@ namespace ParseMusicScoreY
                     }
                 }
             }
-            fs.Close();
-            synchronizationContext.Post(SetEnable, null);
+   
+            synchronizationContext!.Post(SetEnable, null);
         }
 
         [DllImport("user32.dll", SetLastError = true)]
