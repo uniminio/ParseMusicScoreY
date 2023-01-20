@@ -39,6 +39,7 @@ namespace ParseMusicScoreY
             var fs = File.OpenText(textBox1.Text);
             string content = fs.ReadToEnd();
             fs.Close();
+            content = NtoC(content);
             string[] lines = content.Split('\n');
             foreach(string line in lines)
             {
@@ -162,6 +163,33 @@ namespace ParseMusicScoreY
         {
             started = false;
             button2.Enabled = true;
+        }
+
+        private string NtoC(string content)
+        {
+            string ts = content.Replace("+1", "Q");
+            ts = ts.Replace("+2", "W");
+            ts = ts.Replace("+3", "E");
+            ts = ts.Replace("+4", "R");
+            ts = ts.Replace("+5", "T");
+            ts = ts.Replace("+6", "Y");
+            ts = ts.Replace("+7", "U");
+            ts = ts.Replace("-1", "Z");
+            ts = ts.Replace("-2", "X");
+            ts = ts.Replace("-3", "C");
+            ts = ts.Replace("-4", "V");
+            ts = ts.Replace("-5", "B");
+            ts = ts.Replace("-6", "N");
+            ts = ts.Replace("-7", "M");
+            ts = ts.Replace("1", "A");
+            ts = ts.Replace("2", "S");
+            ts = ts.Replace("3", "D");
+            ts = ts.Replace("4", "F");
+            ts = ts.Replace("5", "G");
+            ts = ts.Replace("6", "H");
+            ts = ts.Replace("7", "J");
+            ts = ts.Replace("0", "P");
+            return ts;
         }
     }
 }
